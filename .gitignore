@@ -1,0 +1,9 @@
+target/
+data/
+.idea/
+.docusaurus/
+node_modules/
+build/
+*.swp
+.vscode
+.DS_Store

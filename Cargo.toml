@@ -1,0 +1,30 @@
+[package]
+name = "bloom-p2p"
+version = "0.1.0"
+authors = ["YkiosmE"]
+edition = "2018"
+
+[dependencies]
+log = "0.4"
+env_logger = "0.7"
+ctrlc = "3"
+rlp = "0.4"
+network-devp2p = {package = "ethcore-network-devp2p", path = "./network-devp2p" }
+network = { package = "ethcore-network", path = "./network" }
+structopt = "0.3.8"
+parking_lot = "0.10.0"
+serde = "1.0"
+serde_json = "1.0"
+ethereum-types = "0.9.0"
+tiny-keccak = { version = "2.0.1", features = ["keccak"] }
+rustc-hex = "2.1.0"
+
+jsonrpc-core-client = "14.1"
+jsonrpc-core = "14.1"
+jsonrpc-pubsub = "14.1"
+jsonrpc-tcp-server = "14.1"
+jsonrpc-derive = "14.1"
+
+[workspace]
+members = ["network-devp2p"]
+

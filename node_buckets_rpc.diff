@@ -1,0 +1,63 @@
+diff --git a/network-devp2p/src/discovery.rs b/network-devp2p/src/discovery.rs
+index 22f24be..cfe9955 100644
+--- a/network-devp2p/src/discovery.rs
++++ b/network-devp2p/src/discovery.rs
+@@ -184,6 +184,12 @@ pub struct TableUpdates {
+ }
+ 
+ impl Discovery {
++	pub fn get_node_buckets(&self) -> Vec<Vec<NodeEntry>> {
++		(0..ADDRESS_BITS).map(|i| self.node_buckets[i].nodes.iter()
++			.map(|n| n.address.clone()).collect())
++			.collect()
++	}
++
+ 	pub fn new(key: &KeyPair, public: NodeEndpoint, enr: Enr, ip_filter: IpFilter) -> Discovery {
+ 		Discovery {
+ 			id: *key.public(),
+diff --git a/network-devp2p/src/host.rs b/network-devp2p/src/host.rs
+index 052e808..bc962a2 100644
+--- a/network-devp2p/src/host.rs
++++ b/network-devp2p/src/host.rs
+@@ -279,6 +279,14 @@ pub struct Host {
+ }
+ 
+ impl Host {
++	pub fn get_node_buckets(&self) -> Option<Vec<Vec<NodeEntry>>> {
++		if let Some(ref discovery) = *self.discovery.lock() {
++			Some(discovery.get_node_buckets())
++		} else {
++			None
++		}
++	}
++
+ 	/// Create a new instance
+ 	pub fn new(mut config: NetworkConfiguration, filter: Option<Arc<dyn ConnectionFilter>>) -> Result<Host, Error> {
+ 		let mut listen_address = match config.listen_address {
+diff --git a/network-devp2p/src/service.rs b/network-devp2p/src/service.rs
+index 73b4025..c23404c 100644
+--- a/network-devp2p/src/service.rs
++++ b/network-devp2p/src/service.rs
+@@ -28,6 +28,7 @@ use network::{
+ 	NetworkIoMessage, NetworkProtocolHandler, NonReservedPeerMode, PeerId, ProtocolId,
+ 
+ };
++use crate::discovery::NodeEntry;
+ 
+ use crate::host::Host;
+ 
+@@ -59,6 +60,14 @@ pub struct NetworkService {
+ }
+ 
+ impl NetworkService {
++	pub fn get_node_buckets(&self) -> Option<Vec<Vec<NodeEntry>>> {
++		if let Some(ref host) = *self.host.read() {
++			host.get_node_buckets()
++		} else {
++			None
++		}
++	}
++
+ 	/// Starts IO event loop
+ 	pub fn new(config: NetworkConfiguration, filter: Option<Arc<dyn ConnectionFilter>>) -> Result<NetworkService, Error> {
+ 		let host_handler = Arc::new(HostHandler { public_url: RwLock::new(None) });
